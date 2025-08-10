@@ -59,8 +59,8 @@ class NoticeScraper:
            
     def upload_db(self, scraped_notices):
         myclient = pymongo.MongoClient("mongodb+srv://admin:asdf%401234@ping.uskhf3w.mongodb.net/")
-        mydb = myclient["learnDB"]
-        mycol = mydb["Notices"]
+        mydb = myclient["Notice_data"]
+        mycol = mydb["notices"]
         # mycol.create_index("notice_url", unique=True)
 
 
