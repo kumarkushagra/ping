@@ -6,7 +6,6 @@ WORKDIR /app
 
 # Copy requirements (if you have one) and source code
 COPY main.py ./
-COPY scraper.py ./
 COPY requirements.txt ./
 
 # Install dependencies
