@@ -79,7 +79,7 @@ class NoticeScraper:
             soup = BeautifulSoup(response.content, 'html.parser') 
             scraped_notices = self.jsonify_soup(soup)
             self.upload_db(scraped_notices)
-            time.sleep(5*60)
+            time.sleep(20*60)
             
             
 if __name__=="__main__":
