@@ -13,9 +13,6 @@ from ollama import Client
 
 
 class summarize():
-    def __init__(self):
-        self.default_dpi = 300
-        self.tesseract_lang = "eng"
 
     def download(self, url, pdf_name="/home/vector/project/github/ping/testing_new.pdf"):
         try:
@@ -70,7 +67,7 @@ class summarize():
         class ImageDescription(BaseModel):
             text: str
             summary: str
-            tags: Literal['Fee submition', 'Datesheet', 'Misc.']
+            tags: Literal['Fee submition', 'Datesheet', 'Attendence', 'Misc.']
             time_of_day: datetime | None
             department: Literal[
                 'ECE', 'Admin', 'CSE', 'IT', 'Mechanical',
@@ -87,20 +84,24 @@ class summarize():
 
         results = []
         # Convert PDF pages to images
-        images = convert_from_path(str(path), dpi=self.default_dpi)
+        images = convert_from_path(str(path), dpi=300)
         for idx, img in enumerate(images):
+            if(idx>10):
+                break
+            
             temp_img = f"/tmp/page_{idx+1}.png"
             img.save(temp_img, "PNG")
 
             response = client.chat(
-                model='gemma3:4b',
+                model='gemma3:4b', # smallest gemma model capable of image processing
                 format=ImageDescription.model_json_schema(),
                 messages=[
                     {
                         'role': 'user',
                         'content': (
                             "Extract information from this image and fill the JSON according to the schema. "
-                            "Fields: text, summary, tags, time_of_day, department, priority. "
+                            "Fields: text, summary, tags, time_of_day, department."
+                            "fill the Entire text"
                             "If unknown, leave empty or null. Return only valid JSON. "
                             "Keep summary TO THE POINT and professional."
                         ),
@@ -113,12 +114,10 @@ class summarize():
             # Validate response into schema
             image_analysis = ImageDescription.model_validate_json(response['message']['content'])
             results.append(image_analysis.model_dump())
+            os.remove(temp_img) # removing image from /tmp/
+
 
         return results
-
-    def update(self, json):
-        
-        return
 
     def main(self, url):
         path = self.download(url)
